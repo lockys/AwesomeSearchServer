@@ -1,0 +1,17 @@
+{
+  "name": "awesome-search-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "calvinjeng",
+  "license": "MIT",
+  "dependencies": {
+    "@hapi/hapi": "^20.1.5",
+    "axios": "^0.21.3",
+    "dotenv": "^10.0.0"
+  }
+}
