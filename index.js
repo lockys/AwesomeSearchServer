@@ -41,19 +41,25 @@ const init = async () => {
       let value = await client.get(`${owner}/${repo}`);
 
       if (!value) {
-        const { status, headers, data } = await octokit.rest.repos.getReadme({
-          owner,
-          repo,
-          mediaType: { format: 'html' },
-        });
+        try {
+          const { status, headers, data } = await octokit.rest.repos.getReadme({
+            owner,
+            repo,
+            mediaType: { format: 'html' },
+          });
 
-        if (status === 200) {
-          client.set(`${owner}/${repo}`, data, 'EX', 60 * 60 * 3);
+          if (status === 200) {
+            client.set(`${owner}/${repo}`, data, 'EX', 60 * 60 * 3);
+          }
+
+          res.status = status;
+          res.headers = headers;
+          res.data = data;
+        } catch {
+          res.status = 404;
+          res.headers = {};
+          res.data = {};
         }
-
-        res.status = status;
-        res.headers = headers;
-        res.data = data;
       } else {
         res.status = 200;
         res.headers = {};
