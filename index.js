@@ -29,8 +29,10 @@ const init = async () => {
   server.route({
     method: 'GET',
     path: '/readme/{owner}/{repo}',
-    cors: {
-      origin: ['http://localhost:3000'],
+    config: {
+      cors: {
+        origin: ['http://localhost:3000'],
+      },
     },
     handler: async (request, h) => {
       const { owner, repo } = request.params;
