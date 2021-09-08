@@ -506,6 +506,13 @@ aggregate-error@^3.1.0:
     clean-stack "^2.0.0"
     indent-string "^4.0.0"
 
+async-redis@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/async-redis/-/async-redis-2.0.0.tgz#478704e48e2ae7a84a7cfd55ab946f463fba9cab"
+  integrity sha512-cGv40n9h3gpAGMGnX1v5ncgHJ2C3TsRmK6Ekt282jVftiky3v0X13PSfnLoRix9uva7ctb2j9lwA3d2qc4KKTA==
+  dependencies:
+    redis "3.1.2"
+
 axios@^0.21.3:
   version "0.21.3"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.3.tgz#f85d9b747f9b66d59ca463605cedf1844872b82e"
@@ -708,7 +715,7 @@ redis-parser@^3.0.0:
   dependencies:
     redis-errors "^1.0.0"
 
-redis@^3.1.2:
+redis@3.1.2, redis@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/redis/-/redis-3.1.2.tgz#766851117e80653d23e0ed536254677ab647638c"
   integrity sha512-grn5KoZLr/qrRQVwoSkmzdbw6pwF+/rwODtrOr6vuBRiR/f3rjSTGupbF90Zpqm2oenix8Do6RV7pYEkGwlKkw==

@@ -4,9 +4,17 @@ const Hapi = require('@hapi/hapi');
 require('dotenv').config();
 const { Octokit, App, Action } = require('octokit');
 const octokit = new Octokit({ auth: process.env.PERSONAL_TOKEN });
-const redis = require('redis');
+const redis = require('async-redis');
+const url = require('url');
 
-const client = redis.createClient();
+let client;
+if (process.env.REDISTOGO_URL) {
+  const rtg = url.parse(process.env.REDISTOGO_URL);
+  client = redis.createClient(rtg.port, rtg.hostname);
+  client.auth(rtg.auth.split(':')[1]);
+} else {
+  client = redis.createClient();
+}
 
 client.on('connect', () => {
   console.log('Redis client connected');
@@ -25,34 +33,27 @@ const init = async () => {
       const { owner, repo } = request.params;
 
       let res = {};
+      let value = await client.get(`${owner}/${repo}`);
 
-      await client.get(`${owner}/${repo}`, async (err, val) => {
-        if (!val) {
-          const { status, headers, data } = await octokit.rest.repos.getReadme({
-            owner,
-            repo,
-            mediaType: { format: 'html' },
-          });
+      if (!value) {
+        const { status, headers, data } = await octokit.rest.repos.getReadme({
+          owner,
+          repo,
+          mediaType: { format: 'html' },
+        });
 
-          if (status === 200) {
-            client.set(
-              `${owner}/${repo}`,
-              data,
-              'EX',
-              60 * 60 * 3,
-              redis.print
-            );
-          }
-
-          res.status = status;
-          res.headers = headers;
-          res.data = data;
-        } else {
-          res.status = 200;
-          res.headers = {};
-          res.data = val;
+        if (status === 200) {
+          client.set(`${owner}/${repo}`, data, 'EX', 60 * 60 * 3);
         }
-      });
+
+        res.status = status;
+        res.headers = headers;
+        res.data = data;
+      } else {
+        res.status = 200;
+        res.headers = {};
+        res.data = value;
+      }
 
       return res;
     },
