@@ -31,7 +31,7 @@ const init = async () => {
     path: '/readme/{owner}/{repo}',
     config: {
       cors: {
-        origin: ['http://localhost:3000'],
+        origin: [process.env.ALLOWED_CORS_DOMAIN],
       },
     },
     handler: async (request, h) => {
@@ -52,21 +52,27 @@ const init = async () => {
             client.set(`${owner}/${repo}`, data, 'EX', 60 * 60 * 3);
           }
 
-          res.status = status;
-          res.headers = headers;
-          res.data = data;
+          res = {
+            status,
+            headers,
+            data,
+          };
         } catch {
-          res.status = 404;
-          res.headers = {};
-          res.data = {};
+          res = {
+            status: 404,
+            headers: {},
+            data: {},
+          };
         }
       } else {
-        res.status = 200;
-        res.headers = {};
-        res.data = value;
+        res = {
+          status: 200,
+          headers: {},
+          data: value,
+        };
       }
 
-      return res;
+      return h.response(res.data).code(res.status);
     },
   });
 
