@@ -31,10 +31,6 @@ const init = async () => {
           mediaType: { format: 'html' },
         });
 
-        if (status === 200) {
-          client.set(`${owner}/${repo}`, data, 'EX', 60 * 60 * 3);
-        }
-
         res = {
           status,
           headers,
