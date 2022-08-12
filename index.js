@@ -4,21 +4,6 @@ const Hapi = require('@hapi/hapi');
 require('dotenv').config();
 const { Octokit, App, Action } = require('octokit');
 const octokit = new Octokit({ auth: process.env.PERSONAL_TOKEN });
-const redis = require('async-redis');
-const url = require('url');
-
-let client;
-if (process.env.REDISTOGO_URL) {
-  const rtg = url.parse(process.env.REDISTOGO_URL);
-  client = redis.createClient(rtg.port, rtg.hostname);
-  client.auth(rtg.auth.split(':')[1]);
-} else {
-  client = redis.createClient();
-}
-
-client.on('connect', () => {
-  console.log('Redis client connected');
-});
 
 const init = async () => {
   const server = Hapi.server({
@@ -38,37 +23,28 @@ const init = async () => {
       const { owner, repo } = request.params;
 
       let res = {};
-      let value = await client.get(`${owner}/${repo}`);
 
-      if (!value) {
-        try {
-          const { status, headers, data } = await octokit.rest.repos.getReadme({
-            owner,
-            repo,
-            mediaType: { format: 'html' },
-          });
+      try {
+        const { status, headers, data } = await octokit.rest.repos.getReadme({
+          owner,
+          repo,
+          mediaType: { format: 'html' },
+        });
 
-          if (status === 200) {
-            client.set(`${owner}/${repo}`, data, 'EX', 60 * 60 * 3);
-          }
-
-          res = {
-            status,
-            headers,
-            data,
-          };
-        } catch {
-          res = {
-            status: 404,
-            headers: {},
-            data: {},
-          };
+        if (status === 200) {
+          client.set(`${owner}/${repo}`, data, 'EX', 60 * 60 * 3);
         }
-      } else {
+
         res = {
-          status: 200,
+          status,
+          headers,
+          data,
+        };
+      } catch {
+        res = {
+          status: 404,
           headers: {},
-          data: value,
+          data: {},
         };
       }
 
