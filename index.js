@@ -8,8 +8,8 @@ const redis = require('async-redis');
 const url = require('url');
 
 let client;
-if (process.env.REDISCLOUD_URL) {
-  const rtg = url.parse(process.env.REDISCLOUD_URL);
+if (process.env.REDIS_PRIVATE_URL) {
+  const rtg = url.parse(process.env.REDIS_PRIVATE_URL);
   client = redis.createClient(rtg.port, rtg.hostname);
   client.auth(rtg.auth.split(':')[1]);
 } else {
